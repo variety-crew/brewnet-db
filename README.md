@@ -4,7 +4,7 @@
 - Linux
     > Just Do it!
 
-- window
+- Window
     > should be executed with shell script on WSL(Windows Subsystem for Linux)
 
 ## Grant execute Authority to shell script
