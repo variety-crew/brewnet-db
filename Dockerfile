@@ -14,7 +14,7 @@ ENV MYSQL_USER=${MYSQL_USER}
 ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
 
 # Copy the custom initialization scripts
-COPY sql-scripts/init/ /docker-entrypoint-initdb.d/
+COPY ./init/ /docker-entrypoint-initdb.d/
 
 # Expose port 3306 to connect MariaDB
 EXPOSE 3306
