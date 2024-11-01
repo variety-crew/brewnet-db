@@ -5,7 +5,7 @@
     > Just Do it!
 
 - Window
-    > should be executed with shell script on WSL(Windows Subsystem for Linux)
+    > Should be executed with shell script on WSL(Windows Subsystem for Linux)
 
 ## Grant execute Authority to shell script
     chmod +x build.sh
