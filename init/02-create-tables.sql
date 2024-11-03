@@ -1,9 +1,9 @@
 -- Create tables in the target database
 USE brewnet;
 
-DROP TABLE IF EXISTS member;
+DROP TABLE IF EXISTS tbl_member;
 
-CREATE TABLE member (
+CREATE TABLE tbl_member (
 	member_code	INT	NOT NULL,
 	id	VARCHAR(255)	NOT NULL,
 	password	VARCHAR(255)	NOT NULL,
@@ -11,46 +11,47 @@ CREATE TABLE member (
 	nickname	VARCHAR(255)	NOT NULL
 );
 
-DROP TABLE IF EXISTS role;
+DROP TABLE IF EXISTS tbl_role;
 
-CREATE TABLE role (
+CREATE TABLE tbl_role (
 	role_code	INT	NOT NULL,
 	role	ENUM('마스터', '관리자', '본사 책임자', '본사 직원', '가맹점', '배송기사')	NOT NULL
 );
 
-DROP TABLE IF EXISTS member_role;
+DROP TABLE IF EXISTS tbl_member_role;
 
-CREATE TABLE member_role (
+CREATE TABLE tbl_member_role (
 	role_code	INT	NOT NULL,
 	member_code	INT	NOT NULL
 );
 
-ALTER TABLE member ADD CONSTRAINT PK_MEMBER PRIMARY KEY (
+ALTER TABLE tbl_member ADD CONSTRAINT PK_TBL_MEMBER PRIMARY KEY (
 	member_code
 );
 
-ALTER TABLE role ADD CONSTRAINT PK_ROLE PRIMARY KEY (
+ALTER TABLE tbl_role ADD CONSTRAINT PK_TBL_ROLE PRIMARY KEY (
 	role_code
 );
 
-ALTER TABLE member_role ADD CONSTRAINT PK_MEMBER_ROLE PRIMARY KEY (
+ALTER TABLE tbl_member_role ADD CONSTRAINT PK_TBL_MEMBER_ROLE PRIMARY KEY (
 	role_code,
 	member_code
 );
 
-ALTER TABLE member_role ADD CONSTRAINT FK_role_TO_member_role_1 FOREIGN KEY (
+ALTER TABLE tbl_member_role ADD CONSTRAINT FK_tbl_role_TO_tbl_member_role_1 FOREIGN KEY (
 	role_code
 )
-REFERENCES role (
+REFERENCES tbl_role (
 	role_code
 );
 
-ALTER TABLE member_role ADD CONSTRAINT FK_member_TO_member_role_1 FOREIGN KEY (
+ALTER TABLE tbl_member_role ADD CONSTRAINT FK_tbl_member_TO_tbl_member_role_1 FOREIGN KEY (
 	member_code
 )
-REFERENCES member (
+REFERENCES tbl_member (
 	member_code
 );
 
-ALTER TABLE member MODIFY member_code INT NOT NULL AUTO_INCREMENT;
-ALTER TABLE role MODIFY role_code INT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE tbl_member MODIFY member_code INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE tbl_role MODIFY role_code INT NOT NULL AUTO_INCREMENT;
