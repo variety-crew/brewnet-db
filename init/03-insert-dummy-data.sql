@@ -365,7 +365,7 @@ INSERT INTO tbl_refund_item_status (return_refund_history_code, item_code, compl
                                                                                           (4, 4, false),
                                                                                           (5, 5, true);
 
--- `mandatory_purchase` 테이블에 더미 데이터 삽입
+-- mandatory_purchase 테이블에 더미 데이터 삽입
 INSERT INTO tbl_mandatory_purchase (min_quantity, created_at, active, item_code) VALUES
                                                                                      (10, NOW(), true, 1),
                                                                                      (20, NOW(), true, 2),
@@ -373,7 +373,7 @@ INSERT INTO tbl_mandatory_purchase (min_quantity, created_at, active, item_code)
                                                                                      (25, NOW(), true, 4),
                                                                                      (30, NOW(), false, 5);
 
--- `franchise_mandatory_purchase` 테이블에 더미 데이터 삽입
+-- franchise_mandatory_purchase 테이블에 더미 데이터 삽입
 INSERT INTO tbl_franchise_mandatory_purchase (quantity, created_at, active, franchise_code, mandatory_purchase_code) VALUES
                                                                                                                          (5, NOW(), true, 1, 1),
                                                                                                                          (8, NOW(), true, 2, 2),
