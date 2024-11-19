@@ -1,4 +1,3 @@
-
 CREATE TABLE tbl_member (
 	member_code	INT	NOT NULL,
 	id	VARCHAR(255)	NOT NULL,
@@ -39,8 +38,7 @@ CREATE TABLE tbl_correspondent (
 	correspondent_code	INT	NOT NULL,
 	name	VARCHAR(255)	NOT NULL,
 	address	VARCHAR(255)	NOT NULL,
-	city	VARCHAR(255)	NULL,
-	province	VARCHAR(255)	NULL,
+	detail_address	VARCHAR(255)	NULL,
 	email	VARCHAR(255)	NULL,
 	contact	VARCHAR(255)	NULL,
 	manager_name	VARCHAR(255)	NULL,
@@ -85,12 +83,6 @@ CREATE TABLE tbl_stock (
 	active	BOOLEAN	NOT NULL
 );
 
-CREATE TABLE tbl_order_item (
-	order_code	INT	NOT NULL,
-	item_code	INT	NOT NULL,
-	quantity	INT	NOT NULL
-);
-
 CREATE TABLE tbl_letter_of_purchase_item (
 	item_code	INT	NOT NULL,
 	letter_of_purchase_code	INT	NOT NULL	COMMENT '구매품의서는 발주서의 모든 정보를 포함함',
@@ -127,8 +119,8 @@ CREATE TABLE tbl_franchise (
 	franchise_code	INT	NOT NULL,
 	franchise_name	VARCHAR(255)	NOT NULL,
 	address	VARCHAR(255)	NOT NULL,
+	detail_address	VARCHAR(255)	NOT NULL,
 	city	VARCHAR(255)	NOT NULL,
-	province	VARCHAR(255)	NOT NULL,
 	contact	VARCHAR(255)	NOT NULL,
 	business_number	VARCHAR(255)	NOT NULL,
 	name	VARCHAR(255)	NOT NULL,
@@ -150,7 +142,7 @@ CREATE TABLE tbl_order (
 	created_at	DATETIME	NOT NULL,
 	active	BOOLEAN	NOT NULL,
 	approved	ENUM('APPROVED', 'UNCONFIRMED', 'REJECTED')	NOT NULL	COMMENT '결재 확인되지 않음, 결재 승인, 결재 반려',
-	drafter_approved	ENUM('APPROVE', 'REJECT')	NULL	COMMENT '승인, 반려',
+	drafter_approved	ENUM('APPROVE', 'REJECT', 'NONE')	NOT NULL	COMMENT '승인, 반려, 미정',
 	sum_price	INT	NOT NULL,
 	franchise_code	INT	NOT NULL,
 	member_code	INT	NULL,
@@ -168,7 +160,7 @@ CREATE TABLE tbl_exchange (
 	order_code	INT	NOT NULL,
 	member_code	INT	NULL,
 	delivery_code	INT	NULL,
-	drafter_approved	ENUM('APPROVE', 'REJECT')	NULL	COMMENT '승인, 반려',
+	drafter_approved	ENUM('APPROVE', 'REJECT', 'NONE')	NOT NULL	COMMENT '승인, 반려, 미정',
 	sum_price	INT	NOT NULL
 );
 
@@ -183,7 +175,7 @@ CREATE TABLE tbl_return (
 	order_code	INT	NOT NULL,
 	member_code	INT	NULL,
 	delivery_code	INT	NULL,
-	drafter_approved	ENUM('APPROVE', 'REJECT')	NULL,
+	drafter_approved	ENUM('APPROVE', 'REJECT', 'NONE')	NOT NULL	COMMENT '승인, 반려, 미정',
 	sum_price	INT	NOT NULL
 );
 
@@ -377,7 +369,9 @@ CREATE TABLE tbl_mandatory_purchase (
 	min_quantity	INT	NOT NULL,
 	created_at	DATETIME	NOT NULL,
 	active	BOOLEAN	NOT NULL,
-	item_code	INT	NOT NULL
+	item_code	INT	NOT NULL,
+	due_date	DATETIME	NOT NULL	COMMENT '해당 날짜까지 주문해야 함',
+	satisfied	BOOLEAN	NOT NULL
 );
 
 CREATE TABLE tbl_franchise_mandatory_purchase (
@@ -404,6 +398,14 @@ CREATE TABLE tbl_purchase_status_history (
 	created_at	DATETIME	NOT NULL,
 	active	BOOLEAN	NOT NULL,
 	letter_of_purchase_code	INT	NOT NULL	COMMENT '구매품의서는 발주서의 모든 정보를 포함함'
+);
+
+CREATE TABLE tbl_order_item (
+	order_code	INT	NOT NULL,
+	item_code	INT	NOT NULL,
+	quantity	INT	NOT NULL,
+	available	ENUM('AVAILABLE', 'UNAVAILABLE')	NOT NULL,
+	part_sum_price	INT	NOT NULL	COMMENT '주문 당시 품목에 대한 결제 금액(단일 품목 가격 * 주문수량)'
 );
 
 ALTER TABLE tbl_member ADD CONSTRAINT PK_TBL_MEMBER PRIMARY KEY (
@@ -442,11 +444,6 @@ ALTER TABLE tbl_item ADD CONSTRAINT PK_TBL_ITEM PRIMARY KEY (
 
 ALTER TABLE tbl_stock ADD CONSTRAINT PK_TBL_STOCK PRIMARY KEY (
 	storage_code,
-	item_code
-);
-
-ALTER TABLE tbl_order_item ADD CONSTRAINT PK_TBL_ORDER_ITEM PRIMARY KEY (
-	order_code,
 	item_code
 );
 
@@ -600,6 +597,11 @@ ALTER TABLE tbl_purchase_status_history ADD CONSTRAINT PK_TBL_PURCHASE_STATUS_HI
 	purchase_status_history_code
 );
 
+ALTER TABLE tbl_order_item ADD CONSTRAINT PK_TBL_ORDER_ITEM PRIMARY KEY (
+	order_code,
+	item_code
+);
+
 ALTER TABLE tbl_member ADD CONSTRAINT FK_tbl_position_TO_tbl_member_1 FOREIGN KEY (
 	position_code
 )
@@ -650,20 +652,6 @@ REFERENCES tbl_storage (
 );
 
 ALTER TABLE tbl_stock ADD CONSTRAINT FK_tbl_item_TO_tbl_stock_1 FOREIGN KEY (
-	item_code
-)
-REFERENCES tbl_item (
-	item_code
-);
-
-ALTER TABLE tbl_order_item ADD CONSTRAINT FK_tbl_order_TO_tbl_order_item_1 FOREIGN KEY (
-	order_code
-)
-REFERENCES tbl_order (
-	order_code
-);
-
-ALTER TABLE tbl_order_item ADD CONSTRAINT FK_tbl_item_TO_tbl_order_item_1 FOREIGN KEY (
 	item_code
 )
 REFERENCES tbl_item (
@@ -1047,6 +1035,21 @@ ALTER TABLE tbl_purchase_status_history ADD CONSTRAINT FK_tbl_letter_of_purchase
 REFERENCES tbl_letter_of_purchase (
 	letter_of_purchase_code
 );
+
+ALTER TABLE tbl_order_item ADD CONSTRAINT FK_tbl_order_TO_tbl_order_item_1 FOREIGN KEY (
+	order_code
+)
+REFERENCES tbl_order (
+	order_code
+);
+
+ALTER TABLE tbl_order_item ADD CONSTRAINT FK_tbl_item_TO_tbl_order_item_1 FOREIGN KEY (
+	item_code
+)
+REFERENCES tbl_item (
+	item_code
+);
+
 
 
 -- unique, auto_increment 추가

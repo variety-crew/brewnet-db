@@ -111,12 +111,12 @@ INSERT INTO tbl_stock (	storage_code, item_code, available_stock, out_stock, in_
 
 
 -- correspondent 테이블 더미 데이터
-INSERT INTO tbl_correspondent (name, address, city, province, email, contact, manager_name, active, created_at) VALUES
-                                                                                                                    ('Correspondent A', '123 Street', 'City A', 'Province A', 'contactA@example.com', '010-1234-5678', 'Manager A', TRUE, '2024-01-01 09:00:00'),
-                                                                                                                    ('Correspondent B', '456 Avenue', 'City B', 'Province B', 'contactB@example.com', '010-2345-6789', 'Manager B', TRUE, '2024-01-02 10:00:00'),
-                                                                                                                    ('Correspondent C', '789 Road', 'City C', 'Province C', 'contactC@example.com', '010-3456-7890', 'Manager C', FALSE, '2024-01-03 11:00:00'),
-                                                                                                                    ('Correspondent D', '101 Highway', 'City D', 'Province D', 'contactD@example.com', '010-4567-8901', 'Manager D', TRUE, '2024-01-04 12:00:00'),
-                                                                                                                    ('Correspondent E', '202 Boulevard', 'City E', 'Province E', 'contactE@example.com', '010-5678-9012', 'Manager E', TRUE, '2024-01-05 13:00:00');
+INSERT INTO tbl_correspondent (name, address, detail_address, email, contact, manager_name, active, created_at) VALUES
+                                                                                                                    ('Correspondent A', '123 Street', 'City A',  'contactA@example.com', '010-1234-5678', 'Manager A', TRUE, '2024-01-01 09:00:00'),
+                                                                                                                    ('Correspondent B', '456 Avenue', 'City B',  'contactB@example.com', '010-2345-6789', 'Manager B', TRUE, '2024-01-02 10:00:00'),
+                                                                                                                    ('Correspondent C', '789 Road', 'City C',  'contactC@example.com', '010-3456-7890', 'Manager C', FALSE, '2024-01-03 11:00:00'),
+                                                                                                                    ('Correspondent D', '101 Highway', 'City D', 'contactD@example.com', '010-4567-8901', 'Manager D', TRUE, '2024-01-04 12:00:00'),
+                                                                                                                    ('Correspondent E', '202 Boulevard', 'City E', 'contactE@example.com', '010-5678-9012', 'Manager E', TRUE, '2024-01-05 13:00:00');
 
 -- correspondent_item 테이블 더미 데이터
 INSERT INTO tbl_correspondent_item (correspondent_code, item_code, created_at, active) VALUES
@@ -165,7 +165,7 @@ INSERT INTO tbl_order_print (reason, printed_at, active, seal_code, member_code,
 
 
 -- Franchise Table Dummy Data
-INSERT INTO tbl_franchise (franchise_code, franchise_name, address, city, province, business_number, NAME, contact, created_at, active) VALUES
+INSERT INTO tbl_franchise (franchise_code, franchise_name, address, city, detail_address, business_number, NAME, contact, created_at, active) VALUES
                                                                                                                                             (1, 'CoffeeHouse A', '123 Main St', 'Seoul', 'Seoul', '111-111-111', '노다민', '010-1234-5678', '2024-01-01 08:00:00', true),
                                                                                                                                             (2, 'CoffeeHouse B', '456 Maple St', 'Busan', 'Busan', '111-111-222', '양현진', '010-2345-6789', '2024-01-02 09:00:00', true),
                                                                                                                                             (3, 'CoffeeHouse C', '789 Oak St', 'Incheon', 'Incheon', '111-111-333', '용길한', '010-3456-7890', '2024-01-03 10:00:00', true),
@@ -205,12 +205,12 @@ INSERT INTO tbl_order_approver (member_code, order_code, approved, created_at, c
                                                                                                     (5, 5, 'REJECTED', '2024-02-05 12:30:00', 'Approved', true);
 
 -- Order Item Table Dummy Data
-INSERT INTO tbl_order_item (order_code, item_code, quantity) VALUES
-                                                                 (1, 1, 10),
-                                                                 (1, 2, 5),
-                                                                 (2, 3, 8),
-                                                                 (3, 4, 12),
-                                                                 (4, 5, 20);
+INSERT INTO tbl_order_item (order_code, item_code, quantity, available, part_sum_price) VALUES
+                                                                 (1, 1, 10, 'AVAILABLE', 0),
+                                                                 (1, 2, 5, 'AVAILABLE', 0),
+                                                                 (2, 3, 8, 'AVAILABLE', 0),
+                                                                 (3, 4, 12, 'AVAILABLE', 0),
+                                                                 (4, 5, 20, 'AVAILABLE', 0);
 
 -- Exchange Table Dummy Data
 INSERT INTO tbl_exchange (exchange_code, comment, created_at, active, sum_price, reason, explanation, approved, order_code, member_code, delivery_code) VALUES
@@ -366,12 +366,12 @@ INSERT INTO tbl_refund_item_status (return_refund_history_code, item_code, compl
                                                                                           (5, 5, true);
 
 -- mandatory_purchase 테이블에 더미 데이터 삽입
-INSERT INTO tbl_mandatory_purchase (min_quantity, created_at, active, item_code) VALUES
-                                                                                     (10, NOW(), true, 1),
-                                                                                     (20, NOW(), true, 2),
-                                                                                     (15, NOW(), false, 3),
-                                                                                     (25, NOW(), true, 4),
-                                                                                     (30, NOW(), false, 5);
+INSERT INTO tbl_mandatory_purchase (min_quantity, created_at, active, item_code, due_date, satisfied) VALUES
+                                                                                     (10, NOW(), true, 1, DATE_ADD(NOW(), INTERVAL 7 DAY), false),
+                                                                                     (20, NOW(), true, 2, DATE_ADD(NOW(), INTERVAL 37 DAY), true),
+                                                                                     (15, NOW(), false, 3, DATE_ADD(NOW(), INTERVAL 67 DAY), false),
+                                                                                     (25, NOW(), true, 4, DATE_ADD(NOW(), INTERVAL 37 DAY), true),
+                                                                                     (30, NOW(), false, 5, DATE_ADD(NOW(), INTERVAL 7 DAY), false);
 
 -- franchise_mandatory_purchase 테이블에 더미 데이터 삽입
 INSERT INTO tbl_franchise_mandatory_purchase (quantity, created_at, active, franchise_code, mandatory_purchase_code) VALUES
