@@ -1,3 +1,5 @@
+USE brewnet;
+
 CREATE TABLE tbl_member (
 	member_code	INT	NOT NULL,
 	id	VARCHAR(255)	NOT NULL,
@@ -98,7 +100,8 @@ CREATE TABLE tbl_letter_of_purchase (
 	sum_price	INT	NOT NULL,
 	correspondent_code	INT	NOT NULL,
 	member_code	INT	NOT NULL,
-	storage_code	INT	NOT NULL
+	storage_code	INT	NOT NULL,
+	seal_code	INT	NULL
 );
 
 CREATE TABLE tbl_company (
@@ -141,7 +144,7 @@ CREATE TABLE tbl_order (
 	comment	VARCHAR(255)	NULL	COMMENT '누가 작성하는가? -> 주문담당자',
 	created_at	DATETIME	NOT NULL,
 	active	BOOLEAN	NOT NULL,
-	approved	ENUM('APPROVED', 'UNCONFIRMED', 'REJECTED')	NOT NULL	COMMENT '결재 확인되지 않음, 결재 승인, 결재 반려',
+	approval_status	ENUM('UNCONFIRMED', 'CANCELED', 'APPROVED', 'REJECTED')	NOT NULL	COMMENT '결재 확인되지 않음, 결재 취소, 결재 승인, 결재 반려',
 	drafter_approved	ENUM('APPROVE', 'REJECT', 'NONE')	NOT NULL	COMMENT '승인, 반려, 미정',
 	sum_price	INT	NOT NULL,
 	franchise_code	INT	NOT NULL,
@@ -156,7 +159,7 @@ CREATE TABLE tbl_exchange (
 	active	BOOLEAN	NOT NULL,
 	reason	ENUM('DAMAGED','DEFECTIVE','OTHER')	NOT NULL	COMMENT '파손,품질불량,기타',
 	explanation	VARCHAR(255)	NOT NULL,
-	approved	ENUM('UNCONFIRMED', 'APPROVED', 'REJECTED')	NOT NULL,
+	approval_status	ENUM('UNCONFIRMED', 'CANCELED', 'APPROVED', 'REJECTED')	NOT NULL	COMMENT '결재 확인되지 않음, 결재 취소, 결재 승인, 결재 반려',
 	order_code	INT	NOT NULL,
 	member_code	INT	NULL,
 	delivery_code	INT	NULL,
@@ -171,7 +174,7 @@ CREATE TABLE tbl_return (
 	active	BOOLEAN	NOT NULL,
 	reason	ENUM('DAMAGED','DEFECTIVE','MIND_CHANGE','OTHER')	NOT NULL	COMMENT '파손, 품질불량, 단순변심, 기타',
 	explanation	VARCHAR(255)	NOT NULL,
-	approved	ENUM('APPROVED', 'UNCONFIRMED', 'REJECTED')	NOT NULL,
+	approval_status	ENUM('UNCONFIRMED', 'CANCELED', 'APPROVED', 'REJECTED')	NOT NULL	COMMENT '결재 확인되지 않음, 결재 취소, 결재 승인, 결재 반려',
 	order_code	INT	NOT NULL,
 	member_code	INT	NULL,
 	delivery_code	INT	NULL,
@@ -193,7 +196,7 @@ CREATE TABLE tbl_exchange_item (
 
 CREATE TABLE tbl_return_status_history (
 	return_status_history_code	INT	NOT NULL,
-	status	ENUM('REQUESTED', 'CANCELED', 'APPROVED', 'REJECTED', 'PICKING', 'PICKED','COMPLETED')	NOT NULL	COMMENT '반품요청, 반품취소, 반품승인, 반품반려, 수거중, 수거완료, 반품완료',
+	status	ENUM('REQUESTED', 'PENDING', 'CANCELED', 'APPROVED', 'REJECTED', 'PICKING', 'PICKED','COMPLETED')	NOT NULL	COMMENT '반품요청, 반품취소, 반품승인, 반품반려, 수거중, 수거완료, 반품완료',
 	created_at	DATETIME	NOT NULL,
 	active	BOOLEAN	NOT NULL,
 	return_code	INT	NOT NULL
@@ -201,7 +204,7 @@ CREATE TABLE tbl_return_status_history (
 
 CREATE TABLE tbl_order_status_history (
 	order_status_history_code	INT	NOT NULL,
-	status	ENUM('REQUESTED', 'CANCELED', 'APPROVED', 'REJECTED',  'SHIPPING', 'SHIPPED')	NOT NULL	COMMENT '주문요청, 주문취소, 주문승인,  주문 반려, 배송중, 배송완료',
+	status	ENUM('REQUESTED', 'PENDING', 'CANCELED', 'APPROVED', 'REJECTED',  'SHIPPING', 'SHIPPED')	NOT NULL	COMMENT '주문요청, 주문취소, 주문승인,  주문 반려, 배송중, 배송완료',
 	created_at	DATETIME	NOT NULL,
 	active	BOOLEAN	NOT NULL,
 	order_code	INT	NOT NULL
@@ -209,7 +212,7 @@ CREATE TABLE tbl_order_status_history (
 
 CREATE TABLE tbl_exchange_status_history (
 	exchange_status_history_code	INT	NOT NULL,
-	status	ENUM('REQUESTED', 'CANCELED', 'APPROVED', 'REJECTED', 'PICKING','PICKED','SHIPPING','SHIPPED','COMPLETED')	NOT NULL	COMMENT '교환요청, 교환취소, 교환승인, 교환 반려, 수거중, 수거완료, 배송중, 배송완료,교환완료',
+	status	ENUM('REQUESTED', 'PENDING', 'CANCELED', 'APPROVED', 'REJECTED', 'PICKING','PICKED','SHIPPING','SHIPPED','COMPLETED')	NOT NULL	COMMENT '교환요청,  진행중, 교환취소, 교환승인, 교환 반려, 수거중, 수거완료, 배송중, 배송완료,교환완료',
 	created_at	DATETIME	NOT NULL,
 	active	BOOLEAN	NOT NULL,
 	exchange_code	INT	NOT NULL
@@ -228,7 +231,6 @@ CREATE TABLE tbl_order_print (
 	reason	VARCHAR(500)	NOT NULL,
 	printed_at	DATETIME	NOT NULL	COMMENT '생성일시와 같은 말',
 	active	BOOLEAN	NOT NULL,
-	seal_code	INT	NOT NULL,
 	member_code	INT	NOT NULL,
 	letter_of_purchase_code	INT	NOT NULL	COMMENT '구매품의서는 발주서의 모든 정보를 포함함'
 );
@@ -693,6 +695,13 @@ REFERENCES tbl_storage (
 	storage_code
 );
 
+ALTER TABLE tbl_letter_of_purchase ADD CONSTRAINT FK_tbl_seal_TO_tbl_letter_of_purchase_1 FOREIGN KEY (
+	seal_code
+)
+REFERENCES tbl_seal (
+	seal_code
+);
+
 ALTER TABLE tbl_franchise_member ADD CONSTRAINT FK_tbl_member_TO_tbl_franchise_member_1 FOREIGN KEY (
 	member_code
 )
@@ -824,13 +833,6 @@ ALTER TABLE tbl_seal ADD CONSTRAINT FK_tbl_company_TO_tbl_seal_1 FOREIGN KEY (
 )
 REFERENCES tbl_company (
 	company_code
-);
-
-ALTER TABLE tbl_order_print ADD CONSTRAINT FK_tbl_seal_TO_tbl_order_print_1 FOREIGN KEY (
-	seal_code
-)
-REFERENCES tbl_seal (
-	seal_code
 );
 
 ALTER TABLE tbl_order_print ADD CONSTRAINT FK_tbl_member_TO_tbl_order_print_1 FOREIGN KEY (
@@ -1049,6 +1051,10 @@ ALTER TABLE tbl_order_item ADD CONSTRAINT FK_tbl_item_TO_tbl_order_item_1 FOREIG
 REFERENCES tbl_item (
 	item_code
 );
+
+
+
+
 
 
 

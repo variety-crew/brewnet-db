@@ -151,12 +151,12 @@ INSERT INTO tbl_letter_of_purchase_item (item_code, letter_of_purchase_code, qua
                                                                                            (5, 4, 300);
 
 -- order_print 테이블 더미 데이터
-INSERT INTO tbl_order_print (reason, printed_at, active, seal_code, member_code, letter_of_purchase_code) VALUES
-                                                                                                              ('Urgent order for Project A', '2024-01-01 09:00:00', TRUE, 1, 1, 1),
-                                                                                                              ('Order reprint due to changes', '2024-01-02 10:00:00', TRUE, 1, 2, 2),
-                                                                                                              ('Duplicate for internal records', '2024-01-03 11:00:00', TRUE, 1, 3, 3),
-                                                                                                              ('Additional copy for warehouse', '2024-01-04 12:00:00', TRUE, 1, 4, 4),
-                                                                                                              ('Verification copy', '2024-01-05 13:00:00', TRUE, 1, 5, 5);
+INSERT INTO tbl_order_print (reason, printed_at, active, member_code, letter_of_purchase_code) VALUES
+                                                                                                              ('Urgent order for Project A', '2024-01-01 09:00:00', TRUE, 1, 1),
+                                                                                                              ('Order reprint due to changes', '2024-01-02 10:00:00', TRUE, 2, 2),
+                                                                                                              ('Duplicate for internal records', '2024-01-03 11:00:00', TRUE, 3, 3),
+                                                                                                              ('Additional copy for warehouse', '2024-01-04 12:00:00', TRUE, 4, 4),
+                                                                                                              ('Verification copy', '2024-01-05 13:00:00', TRUE, 5, 5);
 
 
 
@@ -179,7 +179,7 @@ INSERT INTO tbl_franchise_member (member_code, franchise_code, created_at, activ
                                                                                        (5, 5, '2024-01-14 10:00:00', true);
 
 -- Orders Table Dummy Data
-INSERT INTO tbl_order (order_code, comment, created_at, active, approved, drafter_approved, sum_price, franchise_code,  member_code, delivery_code) VALUES
+INSERT INTO tbl_order (order_code, comment, created_at, active, approval_status, drafter_approved, sum_price, franchise_code,  member_code, delivery_code) VALUES
 (1, 'Urgent order', '2024-02-01 08:00:00', true,'APPROVED', 'APPROVE', 100000, 1,  1, 5),
 (2, NULL, '2024-02-02 09:00:00', true, 'APPROVED','APPROVE', 100000, 2,  2, 5),
 (3, 'Additional items', '2024-02-03 10:00:00', true, 'UNCONFIRMED', 'APPROVE', 100000, 3,  3, 5),
@@ -213,7 +213,7 @@ INSERT INTO tbl_order_item (order_code, item_code, quantity, available, part_sum
                                                                  (4, 5, 20, 'AVAILABLE', 0);
 
 -- Exchange Table Dummy Data
-INSERT INTO tbl_exchange (exchange_code, comment, created_at, active, sum_price, reason, explanation, approved, order_code, member_code, delivery_code) VALUES
+INSERT INTO tbl_exchange (exchange_code, comment, created_at, active, sum_price, reason, explanation, approval_status, order_code, member_code, delivery_code) VALUES
 (1, '승인합니다', '2024-02-15 08:00:00', true, 100000, 'DAMAGED', '배송중 손상', 'APPROVED', 1,  1, 2),
 (2, null, '2024-02-16 08:30:00', true, 300000, 'DEFECTIVE', '불량품 배송됨', 'UNCONFIRMED', 2,  1, 2),
 (3, null, '2024-02-18 08:40:00', true, 400000, 'DAMAGED', '박스 파손됨', 'UNCONFIRMED', 3,  1, 2),
@@ -294,7 +294,7 @@ INSERT INTO tbl_exchange_item_status (exchange_stock_history_code, item_code, qu
 (5, 5, 20, 0);
 
 -- Returns Table Dummy Data
-INSERT INTO tbl_return (return_code, comment, created_at, active, sum_price, reason, explanation, approved, order_code,  member_code, delivery_code) VALUES
+INSERT INTO tbl_return (return_code, comment, created_at, active, sum_price, reason, explanation, approval_status, order_code,  member_code, delivery_code) VALUES
                                                                                                                                                          (1, 'Damaged item return', '2024-02-01 08:00:00', true, 11111, 'DAMAGED', 'Item broken on arrival', 'APPROVED', 1,  1, 5),
                                                                                                                                                          (2, 'Defective item return', '2024-02-02 09:00:00', true, 2222, 'DEFECTIVE', 'Item malfunctioning', 'UNCONFIRMED', 2,  2, 5),
                                                                                                                                                          (3, 'Change of mind', '2024-02-03 10:00:00', true, 333, 'MIND_CHANGE', 'Decided to return', 'UNCONFIRMED', 3,  3, 5),
@@ -383,10 +383,10 @@ INSERT INTO tbl_franchise_mandatory_purchase (quantity, created_at, active, fran
 
 -- tbl_approval 더미 데이터 삽입
 INSERT INTO tbl_approval (kind, sequence, created_at, active, position_code) VALUES
-                                                                                 ('PURCHASE', 1, NOW(), TRUE, 2),
-                                                                                 ('ORDER', 1, NOW(), TRUE, 2),
-                                                                                 ('EXCHANGE', 1, NOW(), FALSE, 2),
-                                                                                 ('RETURN', 1, NOW(), TRUE, 2);
+                                                                                 ('PURCHASE', 1, NOW(), TRUE, 3),
+                                                                                 ('ORDER', 1, NOW(), TRUE, 3),
+                                                                                 ('EXCHANGE', 1, NOW(), FALSE, 3),
+                                                                                 ('RETURN', 1, NOW(), TRUE, 3);
 
 -- tbl_purchase_status_history 더미 데이터 삽입
 INSERT INTO tbl_purchase_status_history (status, created_at, active, letter_of_purchase_code) VALUES
